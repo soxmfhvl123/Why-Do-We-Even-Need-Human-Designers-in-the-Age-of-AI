@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI and Human Designers | Why Do We Need Artists?</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent: #ffb032; /* Amber accent */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            background: #050505;
+            scrollbar-width: none;
+        }
+        html::-webkit-scrollbar { display: none; }
+
+        body {
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background-color: transparent;
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        /* Language Toggle */
+        .lang-toggle {
+            position: fixed;
+            top: 3rem;
+            right: 3rem;
+            z-index: 1000;
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.4rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+        }
+
+        .lang-btn {
+            padding: 0.6rem 1.4rem;
+            border-radius: 50px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            letter-spacing: 0.05em;
+        }
+
+        .lang-btn.active {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 4px 15px rgba(255,255,255,0.2);
+        }
+
+        body.en .lang-ko { display: none; }
+        body.ko .lang-en { display: none; }
+
+        /* Container */
+        .presentation-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+            position: relative;
+            z-index: 2;
+        }
+        .presentation-container::-webkit-scrollbar { display: none; }
+
+        section {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw 12vw;
+            position: relative;
+            background: transparent;
+        }
+
+        .content-wrapper {
+            max-width: 1300px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        section.is-visible .content-wrapper {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 4.5vw;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+            margin-bottom: 2.5rem;
+            word-break: keep-all;
+        }
+
+        h2 {
+            font-size: 3.2vw;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+            word-break: keep-all;
+            letter-spacing: -0.02em;
+        }
+
+        h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 1.2rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        p {
+            font-size: 1.4vw;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            word-break: keep-all;
+            max-width: 850px;
+            line-height: 1.7;
+        }
+
+        strong {
+            color: #fff;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        strong::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 1px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Layouts */
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+            margin-top: 3rem;
+            width: 100%;
+            align-items: center;
+        }
+
+        .item {
+            position: relative;
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .item h4 {
+            font-size: 2vw;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .item h4::before, .item h4::after {
+            content: '';
+            width: 30px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .item p {
+            font-size: 1.2vw;
+            margin: 0 auto;
+            max-width: 750px;
+        }
+
+        .split-layout {
+            display: flex;
+            align-items: flex-start;
+            gap: 8rem;
+        }
+
+        .split-layout .left { flex: 1; }
+        .split-layout .right { flex: 1.2; padding-top: 5rem; }
+
+        .quote-slide { text-align: center; }
+        .quote-text {
+            font-size: 2.8vw;
+            font-weight: 300;
+            line-height: 1.3;
+            color: #fff;
+            margin: 0 auto 3rem auto;
+            font-style: italic;
+        }
+        .author-quote {
+            font-size: 1.2rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        /* Conclusion */
+        .conclusion-slide { text-align: center; }
+        .conclusion-slide h2 { font-size: 4vw; }
+
+        /* UI Elements */
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent), #fff);
+            width: 0%;
+            z-index: 10000;
+            transition: width 0.1s linear;
+        }
+
+        .nav-dots {
+            position: fixed;
+            left: 3rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            z-index: 1000;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .dot.active {
+            background-color: var(--accent);
+            transform: scale(2.5);
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        #bgCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 1; /* Behind presentation-container */
+        }
+
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .mic-hint {
+            position: absolute;
+            bottom: 4rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            pointer-events: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            h1 { font-size: 6vw; }
+            h2 { font-size: 5vw; }
+            p { font-size: 1.8vw; }
+            .split-layout { flex-direction: column; gap: 2rem; }
+            .split-layout .right { padding-top: 0; }
+        }
+
+    </style>
+</head>
+<body class="en">
+    <canvas id="bgCanvas"></canvas>
+    <div class="noise"></div>
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <div class="lang-toggle">
+        <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" data-lang="ko" onclick="setLang('ko')">KR</button>
+    </div>
+
+    <div class="nav-dots" id="navDots"></div>
+
+    <div class="presentation-container" id="container">
+        
+        <!-- Slide 1: Title -->
+        <section class="title-slide" id="titleSection">
+            <div class="content-wrapper" id="titleContent">
+                <h1 class="lang-en">Why Do We Even Need<br>Human Designers<br>in the Age of AI?</h1>
+                <h1 class="lang-ko">AI가 다 해주는 시대에,<br>인간 디자이너(예술가)는<br>도대체 왜 필요한가?</h1>
+            </div>
+            <div class="mic-hint" id="micHint">↑ Click to activate voice</div>
+            <div class="scroll-indicator">
+                <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+        </section>
+
+        <!-- Slide 2: Quote -->
+        <section class="quote-slide">
+            <div class="content-wrapper">
+                <p class="quote-text lang-en">"For small creatures such as we the vastness is bearable only through love."</p>
+                <p class="quote-text lang-ko">"우리처럼 작은 존재가 우주의 광대함을 견디는 방법은 오직 사랑뿐이다."</p>
+                <p class="author-quote">- Carl Sagan</p>
+            </div>
+        </section>
+
+        <!-- Slide 3: Metaphors -->
+        <section>
+            <div class="content-wrapper">
+                <h3 class="lang-en">Metaphor</h3>
+                <h3 class="lang-ko">은유</h3>
+                <h2 class="lang-en">Three Metaphors</h2>
+                <h2 class="lang-ko">세 가지의 은유</h2>
+                <div class="items-list">
+                    <div class="item">
+                        <h4 class="lang-en">The Vastness</h4>
+                        <h4 class="lang-ko">The Vastness (우주의 광대함)</h4>
+                        <p class="lang-en">The cold, infinite sea of data endlessly poured out by AI—an <strong>'inorganic universe'</strong> ruled by algorithms.</p>
+                        <p class="lang-ko">인공지능(AI)이 끝없이 쏟아내는 차갑고 무한한 데이터의 바다, 즉 알고리즘에 의해 지배되는 <strong>'무기질의 우주'</strong></p>
+                    </div>
+                    <div class="item">
+                        <h4 class="lang-en">Small Creatures</h4>
+                        <h4 class="lang-ko">Small Creatures (작은 존재들)</h4>
+                        <p class="lang-en">Fragmented modern individuals (pixels) within this massive expansion of information, and <strong>'human designers'</strong> who easily lose their way in the face of AI's overwhelming production speed.</p>
+                        <p class="lang-ko">그 거대한 정보의 팽창 속에서 파편화된 현대인들(픽셀)이자, 압도적인 AI의 생산 속도 앞에서 길을 잃기 쉬운 <strong>'인간 디자이너'</strong></p>
+                    </div>
+                    <div class="item">
+                        <h4 class="lang-en">Love</h4>
+                        <h4 class="lang-ko">Love (사랑)</h4>
+                        <p class="lang-en">Not a simple emotion, but the <strong>'crystallization of Human Intelligence and organic warmth.'</strong> It encompasses patience, meaning finding, and craftsmanship.</p>
+                        <p class="lang-ko">단순한 감정이 아닌, <strong>'Human Intelligence와 유기적 온기의 결정체'</strong>. 모호함을 견디는 인내, 서사를 엮어내는 의미 발견, 불완전함을 덧입히는 장인정신을 포괄합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: HI -> CI -> DI -->
+        <section>
+            <div class="content-wrapper">
+                <h3 class="lang-en">Framework</h3>
+                <h3 class="lang-ko">프레임워크</h3>
+                <h2 class="lang-en">The Paradigm of Intelligence</h2>
+                <h2 class="lang-ko">지능의 패러다임</h2>
+                <div class="items-list">
+                    <div class="item">
+                        <h4 class="lang-en">Human Intelligence</h4>
+                        <h4 class="lang-ko">Human Intelligence (인간 지능)</h4>
+                        <p class="lang-en">The essence of humanity and our <strong>"organic anchor."</strong> Human intelligence willingly remains in ambiguity and finds meaning within imperfection.</p>
+                        <p class="lang-ko">인간의 본질이자 <strong>"유기적 닻"</strong>. 효율성을 따지지 않고 모호함 속에서 기꺼이 머무르며 불완전함 속에서 의미를 찾아내는 능력입니다.</p>
+                    </div>
+                    <div class="item">
+                        <h4 class="lang-en">Collaborative Intelligence</h4>
+                        <h4 class="lang-ko">Collaborative Intelligence (협업 지능)</h4>
+                        <p class="lang-en">A <strong>"new ecosystem."</strong> A vast cooperative system where humans (Human Intelligence) and AI work as partners, complementing each other's weaknesses.</p>
+                        <p class="lang-ko"><strong>"새로운 생태계"</strong>. 인간(Human Intelligence)과 인공지능(AI)이 서로의 약점을 보완하며 파트너로 일하는 거대한 협력 시스템입니다.</p>
+                    </div>
+                    <div class="item">
+                        <h4 class="lang-en">Design Intelligence</h4>
+                        <h4 class="lang-ko">Design Intelligence (디자인 지능)</h4>
+                        <p class="lang-en">The <strong>"concrete act of creation."</strong> It is the craftsmanship of a new era, deconstructing and curating the alternatives generated by AI.</p>
+                        <p class="lang-ko"><strong>"구체적인 창작 행위"</strong>. AI가 쏟아내는 수천 개의 대안을 인간만의 철학으로 해체하고 큐레이션하는 새로운 시대의 장인정신입니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Patience -->
+        <section>
+            <div class="content-wrapper">
+                <h3>Keyword 1</h3>
+                <h2>Patience</h2>
+                <h4 class="lang-en" style="color: var(--accent); margin-bottom: 2rem; font-size: 1.5vw; font-weight: normal;">The power to resist instant automation</h4>
+                <h4 class="lang-ko" style="color: var(--accent); margin-bottom: 2rem; font-size: 1.5vw; font-weight: normal;">즉각적 자동화에 저항하는 힘</h4>
+                <p class="lang-en">In the AI era, results are generated with a single click. However, true design and art require agonizing within answerless ambiguity (Pedagogy of Ambiguity).</p>
+                <p class="lang-ko">AI 시대에는 클릭 한 번으로 결과물이 나옵니다. 하지만 진정한 디자인은 답이 없는 모호성 속에서 수없이 실패하고 고뇌하는 과정(Pedagogy of Ambiguity)이 필요합니다.</p>
+                <p class="lang-en">Asking the right questions and pondering true value—this <strong>'patience'</strong> is the core of Human Intelligence.</p>
+                <p class="lang-ko">올바른 질문을 던지며 진정한 가치를 고민하는 <strong>'인내'</strong>야말로 기계가 가질 수 없는 Human Intelligence의 핵심입니다.</p>
+            </div>
+        </section>
+
+        <!-- Slide 6: Meaning finding -->
+        <section>
+            <div class="content-wrapper">
+                <h3>Keyword 2</h3>
+                <h2>Meaning finding</h2>
+                <h4 class="lang-en" style="color: var(--accent); margin-bottom: 2rem; font-size: 1.5vw; font-weight: normal;">The power to weave narratives from inorganic data</h4>
+                <h4 class="lang-ko" style="color: var(--accent); margin-bottom: 2rem; font-size: 1.5vw; font-weight: normal;">무기질의 데이터에서 서사를 엮는 힘</h4>
+                <p class="lang-en">AI can generate millions of pixels in seconds, but these results are void of 'soul' and 'intention.'</p>
+                <p class="lang-ko">AI는 단 몇 초 만에 수백만 개의 픽셀을 생성해낼 수 있지만, 그 결과물에는 '영혼'과 '의도'가 비어 있습니다.</p>
+                <p class="lang-en">Weaving cold data into a heartwarming narrative—that is, <strong>'finding and curating meaning'</strong>—is only possible for human artists.</p>
+                <p class="lang-ko">차가운 데이터 우주 속에서 가슴 뭉클한 서사를 엮어내는 <strong>'의미를 발견하고 큐레이션하는 것'</strong>은 오직 인간만이 할 수 있습니다.</p>
+            </div>
+        </section>
+
+        <!-- Slide 7: Craftsmanship -->
+        <section>
+            <div class="content-wrapper">
+                <h3>Keyword 3</h3>
+                <h2>Craftsmanship</h2>
+                <h4 class="lang-en" style="color: var(--accent); margin-bottom: 2rem; font-size: 1.5vw; font-weight: normal;">Evolution into cognitive craftsmanship</h4>
+                <h4 class="lang-ko" style="color: var(--accent); margin-bottom: 2rem; font-size: 1.5vw; font-weight: normal;">인지적 장인정신으로의 진화</h4>
+                <p class="lang-en">Craftsmanship in the Design Intelligence era is <strong>'Cognitive Craftsmanship'</strong>—viewing AI's possibilities with a critical eye and ethical tuning.</p>
+                <p class="lang-ko">Design Intelligence 시대의 장인정신은 AI의 가능성을 비판적인 시각으로 바라보고, 맥락에 맞게 다듬으며 윤리적으로 조율해내는 <strong>'인지적 장인정신'</strong>입니다.</p>
+                <p class="lang-en">It is a process of intentionally deconstructing mechanical perfection to capture the <strong>'aesthetics of human imperfection.'</strong></p>
+                <p class="lang-ko">기계적 완벽함을 의도적으로 해체하고 <strong>'인간적인 불완전함의 미학'</strong>을 담아내는 정교한 과정입니다.</p>
+            </div>
+        </section>
+
+        <!-- Slide 8: Conclusion -->
+        <section class="conclusion-slide">
+            <div class="content-wrapper">
+                <h3 class="lang-en">Conclusion</h3>
+                <h3 class="lang-ko">결론</h3>
+                <h2 class="lang-en">AI may calculate the universe,<br>but humans make it warm.</h2>
+                <h2 class="lang-ko">AI가 우주를 계산할 수는 있어도,<br>그 우주를 따뜻하게 만드는 것은 인간입니다.</h2>
+                <p class="lang-en" style="margin-top: 3rem; font-size: 1.6vw; color: #fff;">
+                    Only 'love'—Human Intelligence—makes the vast universe of AI bearable and meaningful. This is why <strong>human designers must exist forever</strong>.
+                </p>
+                <p class="lang-ko" style="margin-top: 3rem; font-size: 1.6vw; color: #fff;">
+                    끊임없이 쏟아지는 AI의 광대한 우주를 견디게 하고 의미 있게 만드는 것은 오직 Human Intelligence라는 이름의 '사랑'뿐입니다. 이것이 <strong>인간 디자이너가 영원히 존재해야만 하는 이유</strong>입니다.
+                </p>
+            </div>
+        </section>
+
+        <!-- Slide 9: TOK Connection -->
+        <section>
+            <div class="content-wrapper">
+                <h3>TOK Connection</h3>
+                <h2 class="lang-en">How important are material tools in the production or acquisition of knowledge?</h2>
+                <h2 class="lang-ko">지식의 생산이나 습득에 있어 물질적 도구는 얼마나 중요한가?</h2>
+                
+                <div class="items-list">
+                    <div class="item">
+                        <h4 class="lang-en">The Limit of Tools</h4>
+                        <h4 class="lang-ko">물질적 도구의 한계</h4>
+                        <p class="lang-en">AI provides vast data, but it is not 'True Knowledge' until human touch is applied.</p>
+                        <p class="lang-ko">AI라는 압도적 도구는 데이터를 쏟아내지만, 인간의 개입 없이는 '진정한 지식(예술적 의미)'이 될 수 없습니다.</p>
+                    </div>
+                    <div class="item">
+                        <h4 class="lang-en">Active Resistance</h4>
+                        <h4 class="lang-ko">도구에 대한 저항</h4>
+                        <p class="lang-en">Knowledge requires <strong>Patience</strong> to resist automation and <strong>Craftsmanship</strong> to refine AI's perfection.</p>
+                        <p class="lang-ko">지식 생산의 핵심은 도구의 자동화에 저항하는 <strong>인내</strong>와, 기계적 완벽함을 해체하는 <strong>장인정신</strong>입니다.</p>
+                    </div>
+                    <div class="item">
+                        <h4 class="lang-en">Human as Catalyst</h4>
+                        <h4 class="lang-ko">주체로서의 인간</h4>
+                        <p class="lang-en">Material tools offer possibilities, but only Human Intelligence completes the truth.</p>
+                        <p class="lang-ko">물질적 도구(AI)는 무한한 가능성을 제공할 뿐, 최종적인 지식을 완성하는 것은 인간의 <strong>디자인 인텔리전스</strong>입니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    <!-- Slide 10: Space Pen -->
+        <section>
+            <div class="content-wrapper">
+                <h3 class="lang-en">Metaphor 01</h3>
+                <h3 class="lang-ko">은유 01</h3>
+                <h2 class="lang-en">The Space Pen</h2>
+                <h2 class="lang-ko">스페이스 펜</h2>
+                <h4 class="lang-en" style="color: var(--accent); margin-bottom: 2rem; font-size: 1.5vw; font-weight: normal;">Tools have 'potential,' not 'intention.'</h4>
+                <h4 class="lang-ko" style="color: var(--accent); margin-bottom: 2rem; font-size: 1.5vw; font-weight: normal;">도구는 '가능성'일 뿐, '의도'를 갖지 못한다.</h4>
+                <p class="lang-en" style="font-style: italic; color: #fff;">"No matter how perfect a pen is, it cannot write a poem on its own."</p>
+                <p class="lang-ko" style="font-style: italic; color: #fff;">"아무리 완벽한 펜이라도, 스스로 시를 쓸 수는 없다."</p>
+                <p class="lang-en">The Space Pen is the ultimate tool (AI) that works flawlessly in zero gravity. It removes limits on the speed and bounds of knowledge production.</p>
+                <p class="lang-ko">우주비행사들이 쓰는 스페이스 펜은 어떤 환경에서도 완벽히 작동하는 최고의 도구(AI)와 같습니다. 지식 생산의 '속도'와 '한계'를 없애줍니다.</p>
+                <p class="lang-en">However, it cannot write about the awe of space on its own. While AI opens up infinite possibilities, crafting a heart-touching narrative that reaches others is ultimately the role of <strong>Human Intelligence</strong>.</p>
+                <p class="lang-ko">하지만 펜 스스로 우주에서 느끼는 경외감을 적어낼 수는 없습니다. 도구가 무한한 가능성을 열어주더라도, 타인의 마음에 닿는 가슴 뭉클한 서사를 기록하는 것은 결국 <strong>인간 지능(Human Intelligence)</strong>의 역할입니다.</p>
+            </div>
+        </section>
+
+        <!-- Slide 11: Chef's Knife -->
+        <section>
+            <div class="content-wrapper">
+                <h3 class="lang-en">Metaphor 02</h3>
+                <h3 class="lang-ko">은유 02</h3>
+                <h2 class="lang-en">The Chef's Knife</h2>
+                <h2 class="lang-ko">셰프의 칼</h2>
+                <h4 class="lang-en" style="color: var(--accent); margin-bottom: 2rem; font-size: 1.5vw; font-weight: normal;">Craftsmanship in the AI era</h4>
+                <h4 class="lang-ko" style="color: var(--accent); margin-bottom: 2rem; font-size: 1.5vw; font-weight: normal;">AI 시대의 장인정신</h4>
+                <p class="lang-en" style="font-style: italic; color: #fff;">"The knife chops the ingredients, but the chef completes the dish."</p>
+                <p class="lang-ko" style="font-style: italic; color: #fff;">"칼이 재료를 썰어주지만, 요리를 완성하는 것은 셰프다."</p>
+                <p class="lang-en">AI is like a sharp kitchen knife—it instantly analyzes vast information and lays perfectly chopped ingredients (design drafts) on the cutting board.</p>
+                <p class="lang-ko">AI는 아주 날카로운 '주방용 칼'처럼 방대한 정보를 순식간에 분석해, 완벽한 비율로 잘린 재료(초안)들을 도마 위에 올려놓습니다.</p>
+                <p class="lang-en">A true designer resists the tool's immediate results. Deconstructing mechanical perfection and reconstructing it to fit the human context is the new <strong>Design Intelligence</strong>.</p>
+                <p class="lang-ko">진정한 디자이너는 이 도구의 결과에 저항합니다. 기계의 완벽함을 해체하여 인간의 맥락에 맞게 재구성하는 것, 이것이 인간이 도구를 다루는 새로운 장인정신이자 <strong>디자인 인텔리전스(Design Intelligence)</strong>입니다.</p>
+            </div>
+        </section>
+
+        <!-- Slide 12: Nutella -->
+        <section>
+            <div class="content-wrapper">
+                <h3 class="lang-en">Metaphor 03</h3>
+                <h3 class="lang-ko">은유 03</h3>
+                <h2 class="lang-en">Nutella</h2>
+                <h2 class="lang-ko">뉴텔라</h2>
+                <h4 class="lang-en" style="color: var(--accent); margin-bottom: 2rem; font-size: 1.5vw; font-weight: normal;">The biological fuel to resist tools</h4>
+                <h4 class="lang-ko" style="color: var(--accent); margin-bottom: 2rem; font-size: 1.5vw; font-weight: normal;">인간이 도구에 저항할 수 있는 힘, '당(Sugar)'</h4>
+                <p class="lang-en" style="font-style: italic; color: #fff;">"Machines don't get tired, but humans do. That's why we can agonize and love."</p>
+                <p class="lang-ko" style="font-style: italic; color: #fff;">"기계는 지치지 않지만, 인간은 지친다. 그래서 우리는 고뇌하고 사랑할 수 있다."</p>
+                <p class="lang-en">While AI never tires, humans are fragile organisms that feel fatigue and need sugar to endure the agony of creation. Yet, it is this very limitation that stops us from compromising with immediate, automated answers.</p>
+                <p class="lang-ko">지치지 않는 AI와 달리 인간은 피로를 느끼고 당을 섭취해야만 고뇌를 이어갈 수 있는 연약한 유기체입니다. 하지만 바로 이 점 때문에 즉각적인 도구의 유혹에 타협하지 않고 치열하게 고뇌할 수 있습니다.</p>
+                <p class="lang-en">A spoonful of Nutella is the biological driving force that lets us infuse organic warmth into the vastness of the inorganic universe. It is the very proof of <strong>Love</strong>.</p>
+                <p class="lang-ko">뉴텔라 한 스푼은 무기질의 우주(The Vastness)에 압도당하지 않고 유기적인 온기를 불어넣게 해주는 생물학적 원동력이자, <strong>'사랑(Love)'</strong>의 증거입니다.</p>
+            </div>
+        </section>
+
+        <!-- Slide 13: Conclusion -->
+        <section class="conclusion-slide">
+            <div class="content-wrapper">
+                <h3 class="lang-en">Final Conclusion</h3>
+                <h3 class="lang-ko">최종 결론</h3>
+                <h2 class="lang-en">Only Love Makes the Vastness Bearable</h2>
+                <h2 class="lang-ko">오직 사랑만이 우주의 광대함을 견디게 한다</h2>
+                <p class="lang-en" style="margin-top: 3rem; font-size: 1.6vw; color: #fff;">
+                    Material tools (AI) are essential for opening up boundless possibilities. However, transforming the 'inorganic universe' into meaningful knowledge is the responsibility of humans who critically intervene. When cold AI meets the warm <strong>Human Intelligence (Love)</strong>, we can finally produce the most authentic knowledge of our time.
+                </p>
+                <p class="lang-ko" style="margin-top: 3rem; font-size: 1.6vw; color: #fff;">
+                    인공지능이라는 물질적 도구는 방대한 가능성을 열어줍니다. 하지만 도구가 만들어낸 '무기질의 우주'를 가치 있는 지식으로 변환시키는 것은 결국 인간의 몫입니다. 완벽하지만 차가운 기계와 유한하지만 따뜻한 <strong>인간 지능(사랑)</strong>이 공명할 때, 우리는 비로소 진실된 지식을 생산할 수 있습니다.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function setLang(lang) {
+            document.body.classList.remove('en', 'ko');
+            document.body.classList.add(lang);
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+            });
+        }
+
+        // ── Wrap title text into per-char spans ────────────────
+        function wrapTitleChars() {
+            document.querySelectorAll('#titleSection h1').forEach(h1 => {
+                if (h1.dataset.wrapped) return;
+                h1.dataset.wrapped = '1';
+                const html = h1.innerHTML;
+                // Split preserving <br>
+                const parts = html.split(/<br\s*\/?>/i);
+                h1.innerHTML = parts.map(part => {
+                    const tmp = document.createElement('div');
+                    tmp.innerHTML = part;
+                    const text = tmp.textContent;
+                    return [...text].map(ch =>
+                        `<span class="char" style="display:inline-block">${ch === ' ' ? '&nbsp;' : ch}</span>`
+                    ).join('');
+                }).join('<br>');
+            });
+        }
+
+        function initPresentation() {
+            try {
+                console.log("Presentation script initializing...");
+                wrapTitleChars();
+
+            // ── Nav dots ──────────────────────────────────────
+            const sections = document.querySelectorAll('section');
+            const container = document.getElementById('container');
+            const progressBar = document.getElementById('progressBar');
+            const navDotsContainer = document.getElementById('navDots');
+            sections.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (index === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => sections[index].scrollIntoView({ behavior: 'smooth' }));
+                navDotsContainer.appendChild(dot);
+            });
+            const dots = document.querySelectorAll('.dot');
+            const slideObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        const index = Array.from(sections).indexOf(entry.target);
+                        dots.forEach(dot => dot.classList.remove('active'));
+                        if (dots[index]) dots[index].classList.add('active');
+                        progressBar.style.width = `${(index / (sections.length - 1)) * 100}%`;
+                        window.isLastSlide = (index === sections.length - 1);
+                    }
+                });
+            }, { root: container, threshold: 0.5 });
+            sections.forEach(s => slideObserver.observe(s));
+
+            // ── Canvas ────────────────────────────────────────
+            window.isLastSlide = false;
+            const bgCanvas = document.getElementById('bgCanvas');
+            const bgCtx = bgCanvas.getContext('2d');
+            let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2, isDown: false };
+            let audioCtx, analyser, dataArray, micEnabled = false;
+            let voiceAmp = 0;
+            let charOffsets = [];
+
+            // ── Variable Definitions ──────────────────────────────
+            const ASCII_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,;:!?/\\|[]{}()-_=+~`@#$%^&*';
+            const NUM_ASCII = 700;
+            const asciiP = [];
+            
+            const BLOB_COUNT = 16;
+            const blobTrail = Array.from({ length: BLOB_COUNT }, () => ({
+                x: window.innerWidth / 2, y: window.innerHeight / 2
+            }));
+            
+            const NUM_P = 450;
+            const px = new Float32Array(NUM_P);
+            const py = new Float32Array(NUM_P);
+            const pvx = new Float32Array(NUM_P);
+            const pvy = new Float32Array(NUM_P);
+            const psize = new Float32Array(NUM_P);
+
+            function initAscii() {
+                asciiP.length = 0;
+                const W = bgCanvas.width, H = bgCanvas.height;
+                for (let i = 0; i < NUM_ASCII; i++) {
+                    asciiP.push({
+                        x: Math.random() * W,
+                        y: Math.random() * H,
+                        ch: ASCII_CHARS[Math.floor(Math.random() * ASCII_CHARS.length)],
+                        size: 10 + Math.random() * 8,
+                        alpha: 0.12 + Math.random() * 0.18,
+                        swapTimer: Math.random() * 180,
+                        driftX: (Math.random() - 0.5) * 0.3,
+                        driftY: (Math.random() - 0.5) * 0.3,
+                        orbitSpeed: (Math.random() - 0.5) * 0.6,
+                        phase: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            function initParticles() {
+                for (let i = 0; i < NUM_P; i++) {
+                    px[i] = Math.random() * bgCanvas.width;
+                    py[i] = Math.random() * bgCanvas.height;
+                    pvx[i] = (Math.random() - 0.5) * 1.0;
+                    pvy[i] = (Math.random() - 0.5) * 1.0;
+                    psize[i] = Math.random() * 1.4 + 0.5;
+                }
+            }
+
+            function resize() {
+                bgCanvas.width = window.innerWidth;
+                bgCanvas.height = window.innerHeight;
+                initAscii();
+                initParticles();
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            // Mouse / Touch
+            window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+            window.addEventListener('mousedown', e => { mouse.isDown = true; mouse.x = e.clientX; mouse.y = e.clientY; });
+            window.addEventListener('mouseup', () => mouse.isDown = false);
+            window.addEventListener('touchstart', e => { const t = e.touches[0]; mouse.x = t.clientX; mouse.y = t.clientY; mouse.isDown = true; }, { passive: true });
+            window.addEventListener('touchmove', e => { const t = e.touches[0]; mouse.x = t.clientX; mouse.y = t.clientY; }, { passive: true });
+            window.addEventListener('touchend', () => mouse.isDown = false);
+
+            // Mic
+            async function enableMic() {
+                if (micEnabled) return;
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioCtx.createAnalyser();
+                    analyser.fftSize = 256;
+                    analyser.smoothingTimeConstant = 0.75;
+                    audioCtx.createMediaStreamSource(stream).connect(analyser);
+                    dataArray = new Uint8Array(analyser.frequencyBinCount);
+                    micEnabled = true;
+                    const hint = document.getElementById('micHint');
+                    if (hint) hint.textContent = '🎙 Voice active';
+                } catch (e) {
+                    const hint = document.getElementById('micHint');
+                    if (hint) hint.textContent = '🎙 Voice simulated (HTTP/file restricted)';
+                    micEnabled = true;
+                    dataArray = new Uint8Array(256);
+                    setInterval(() => {
+                        for(let i=0; i<256; i++) dataArray[i] = Math.random() * 180;
+                    }, 50);
+                }
+            }
+            const titleSection = document.getElementById('titleSection');
+            if (titleSection) titleSection.addEventListener('click', enableMic);
+
+            // Definitions moved up to avoid TDZ ReferenceError
+
+            // ── Main render loop ──────────────────────────────
+            let lastFrame = 0;
+            let frameCount = 0;
+            let blobAlpha = 1.0;
+            function animate(ts) {
+                requestAnimationFrame(animate);
+                const dt = Math.min((ts - lastFrame) / 16.67, 3);
+                lastFrame = ts;
+                frameCount++;
+                const W = bgCanvas.width, H = bgCanvas.height;
+
+                // Smooth blob transition
+                const targetBlobAlpha = window.isLastSlide ? 0 : 1;
+                blobAlpha += (targetBlobAlpha - blobAlpha) * 0.08; // 8% fade per frame
+
+                // Mic
+                if (micEnabled) {
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+                    voiceAmp += (sum / (dataArray.length * 255) - voiceAmp) * 0.18;
+                }
+
+                // Fill canvas with solid background to ensure visibility behind text
+                bgCtx.fillStyle = '#050505';
+                bgCtx.fillRect(0, 0, W, H);
+
+                // ── ASCII Twirl background ─────────────────────
+                {
+                    const cx = W / 2, cy = H / 2;
+                    bgCtx.save();
+                    bgCtx.textBaseline = 'middle';
+                    bgCtx.textAlign = 'center';
+                    const time = ts * 0.00008;
+
+                    for (let i = 0; i < NUM_ASCII; i++) {
+                        const p = asciiP[i];
+
+                        // Base drift
+                        p.x += p.driftX;
+                        p.y += p.driftY;
+
+                        // Swirl around center slowly (orbit), no inward pull
+                        const dx = p.x - cx, dy = p.y - cy;
+                        const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+                        
+                        // Perpendicular orbit motion
+                        p.x += (-dy / dist) * p.orbitSpeed;
+                        p.y += (dx / dist) * p.orbitSpeed;
+
+                        // Subtle wave flow
+                        p.x += Math.sin(p.y * 0.005 + time * 10 + p.phase) * 0.2;
+                        p.y += Math.cos(p.x * 0.005 + time * 10 + p.phase) * 0.2;
+
+                        // Wrap
+                        if (p.x < -20) p.x = W + 20;
+                        if (p.x > W + 20) p.x = -20;
+                        if (p.y < -20) p.y = H + 20;
+                        if (p.y > H + 20) p.y = -20;
+
+                        // Swap char occasionally
+                        p.swapTimer--;
+                        if (p.swapTimer <= 0) {
+                            p.ch = ASCII_CHARS[Math.floor(Math.random() * ASCII_CHARS.length)];
+                            p.swapTimer = 60 + Math.random() * 240;
+                        }
+
+                        // Mouse proximity brightens chars
+                        const mdx = mouse.x - p.x, mdy = mouse.y - p.y;
+                        const mdist = Math.sqrt(mdx*mdx + mdy*mdy);
+                        const mProx = Math.max(0, 1 - mdist / 400);
+                        const alpha = p.alpha * 1.5 + mProx * 0.45; // Enhanced visibility
+
+                        bgCtx.globalAlpha = alpha;
+                        bgCtx.font = `${p.size}px "Courier New", monospace`;
+                        bgCtx.fillStyle = mProx > 0.1
+                            ? `rgb(${Math.round(200+mProx*55)},${Math.round(220+mProx*35)},255)`
+                            : 'rgb(180,210,255)';
+                        bgCtx.fillText(p.ch, p.x, p.y);
+                    }
+                    bgCtx.restore();
+                }
+
+                // ── Huge Amber Blob ────────────────────────────
+                if (blobAlpha > 0.005) {
+                    // Update trail
+                    blobTrail[0].x += (mouse.x - blobTrail[0].x) * 0.12;
+                    blobTrail[0].y += (mouse.y - blobTrail[0].y) * 0.12;
+                    for (let i = 1; i < BLOB_COUNT; i++) {
+                        blobTrail[i].x += (blobTrail[i-1].x - blobTrail[i].x) * 0.22;
+                        blobTrail[i].y += (blobTrail[i-1].y - blobTrail[i].y) * 0.22;
+                    }
+                    
+                    bgCtx.save();
+                    bgCtx.globalCompositeOperation = 'screen';
+                    bgCtx.globalAlpha = Math.max(0, Math.min(1, blobAlpha));
+
+                    // Outer mega-glow: covers most of screen
+                    const W2 = Math.max(W, H);
+                    const megaGlow = bgCtx.createRadialGradient(
+                        blobTrail[0].x, blobTrail[0].y, 0,
+                        blobTrail[0].x, blobTrail[0].y, W2 * 0.75
+                    );
+                    megaGlow.addColorStop(0,   'rgba(255,140,20,0.35)');
+                    megaGlow.addColorStop(0.3, 'rgba(200,90,10,0.18)');
+                    megaGlow.addColorStop(0.7, 'rgba(150,50,5,0.07)');
+                    megaGlow.addColorStop(1,   'rgba(0,0,0,0)');
+                    bgCtx.fillStyle = megaGlow;
+                    bgCtx.fillRect(0, 0, W, H);
+
+                    // Mid blob layers (trail)
+                    for (let i = BLOB_COUNT - 1; i >= 0; i--) {
+                        const r = 550 - i * 30;
+                        if (r <= 0) continue;
+                        const bx = blobTrail[i].x, by = blobTrail[i].y;
+                        const g = bgCtx.createRadialGradient(bx, by, 0, bx, by, r);
+                        const a = (1 - i / BLOB_COUNT) * 0.6;
+                        g.addColorStop(0,   `rgba(255,160,30,${a})`);
+                        g.addColorStop(0.4, `rgba(230,100,15,${a * 0.6})`);
+                        g.addColorStop(0.8, `rgba(180,60,5,${a * 0.2})`);
+                        g.addColorStop(1,   'rgba(0,0,0,0)');
+                        bgCtx.fillStyle = g;
+                        bgCtx.beginPath();
+                        bgCtx.arc(bx, by, r, 0, 6.283);
+                        bgCtx.fill();
+                    }
+
+                    // Hot core
+                    const core = bgCtx.createRadialGradient(
+                        blobTrail[0].x, blobTrail[0].y, 0,
+                        blobTrail[0].x, blobTrail[0].y, 250
+                    );
+                    core.addColorStop(0,   'rgba(255,230,150,0.95)');
+                    core.addColorStop(0.3, 'rgba(255,170,50,0.7)');
+                    core.addColorStop(1,   'rgba(0,0,0,0)');
+                    bgCtx.fillStyle = core;
+                    bgCtx.beginPath();
+                    bgCtx.arc(blobTrail[0].x, blobTrail[0].y, 250, 0, 6.283);
+                    bgCtx.fill();
+                    
+                    bgCtx.restore();
+                }
+
+                // ── Particle Universe (last slide) ─────────────
+                if (window.isLastSlide) {
+                    bgCtx.fillStyle = 'rgba(0,0,0,0.15)';
+                    bgCtx.fillRect(0, 0, W, H);
+                    const mx = mouse.x, my = mouse.y, down = mouse.isDown;
+
+                    // Bloom layer
+                    bgCtx.save();
+                    bgCtx.globalCompositeOperation = 'screen';
+                    for (let i = 0; i < NUM_P; i++) {
+                        const ddx = mx - px[i], ddy = my - py[i];
+                        const d2 = ddx*ddx + ddy*ddy;
+                        const near = d2 < 90000;
+                        const bloomR = near ? psize[i] * (down ? 18 : 9) : psize[i] * 5;
+                        const bloomA = near ? (down ? 0.18 : 0.1) : 0.05;
+                        const bg2 = bgCtx.createRadialGradient(px[i], py[i], 0, px[i], py[i], bloomR);
+                        if (down && near) {
+                            bg2.addColorStop(0, `rgba(255,200,80,${bloomA})`);
+                        } else {
+                            bg2.addColorStop(0, `rgba(200,220,255,${bloomA})`);
+                        }
+                        bg2.addColorStop(1, 'rgba(0,0,0,0)');
+                        bgCtx.fillStyle = bg2;
+                        bgCtx.beginPath();
+                        bgCtx.arc(px[i], py[i], bloomR, 0, 6.283);
+                        bgCtx.fill();
+                    }
+                    bgCtx.restore();
+
+                    // Core particles
+                    for (let i = 0; i < NUM_P; i++) {
+                        const dx = mx - px[i], dy = my - py[i];
+                        const dist2 = dx*dx + dy*dy;
+                        if (down && dist2 < 1440000) {
+                            const dist = Math.sqrt(dist2) || 1;
+                            const force = (1200 - dist) / 1200 * 1.1;
+                            pvx[i] += (dx/dist) * force * dt;
+                            pvy[i] += (dy/dist) * force * dt;
+                            pvx[i] *= 0.87; pvy[i] *= 0.87;
+                        } else {
+                            pvx[i] += (Math.random()-0.5) * 0.12 * dt;
+                            pvy[i] += (Math.random()-0.5) * 0.12 * dt;
+                            const spd = Math.sqrt(pvx[i]*pvx[i]+pvy[i]*pvy[i]);
+                            if (spd > 1.0) { pvx[i] /= spd; pvy[i] /= spd; }
+                        }
+                        px[i] += pvx[i] * dt; py[i] += pvy[i] * dt;
+                        if (px[i] < 0) px[i] = W; if (px[i] > W) px[i] = 0;
+                        if (py[i] < 0) py[i] = H; if (py[i] > H) py[i] = 0;
+
+                        const d2 = (mx-px[i])*(mx-px[i])+(my-py[i])*(my-py[i]);
+                        const near = d2 < 90000;
+                        let sz = psize[i], ca = 0.55, colR = 255, colG = 255, colB = 255;
+                        if (near && down) {
+                            const t = 1 - Math.sqrt(d2)/300;
+                            colG = Math.round(220-t*120); colB = Math.round(100-t*80);
+                            ca = 0.6 + t * 0.4; sz += t * 3;
+                        } else if (near) {
+                            ca = 0.75; sz *= 1.4;
+                        }
+                        bgCtx.fillStyle = `rgba(${colR},${colG},${colB},${ca})`;
+                        bgCtx.beginPath();
+                        bgCtx.arc(px[i], py[i], sz, 0, 6.283);
+                        bgCtx.fill();
+                    }
+                }
+
+                // ── Per-char mic floating ──────────────────────
+                const chars = document.querySelectorAll('#titleSection h1 .char');
+                if (chars.length > 0) {
+                    if (micEnabled && voiceAmp > 0.005) {
+                        while (charOffsets.length < chars.length)
+                            charOffsets.push({ phase: Math.random()*Math.PI*2, freq: 0.8+Math.random()*1.5 });
+                        const tSec = ts / 1000;
+                        chars.forEach((ch, i) => {
+                            const o = charOffsets[i];
+                            const a = voiceAmp;
+                            const dy = Math.sin(tSec*o.freq*4 + o.phase) * a * 100;
+                            const dx = Math.cos(tSec*o.freq*2.5 + o.phase) * a * 60;
+                            const rot = Math.sin(tSec*o.freq*1.5 + o.phase*0.5) * a * 30;
+                            const sc = 1 + Math.abs(Math.sin(tSec*o.freq*2+o.phase)) * a * 0.8;
+                            ch.style.transform = `translate(${dx}px,${dy}px) rotate(${rot}deg) scale(${sc})`;
+                            ch.style.textShadow = `0 0 ${a*80}px rgba(255,255,255,${a*1.2})`;
+                            ch.style.opacity = 0.5 + a * 0.5;
+                        });
+                    } else {
+                        chars.forEach(ch => {
+                            ch.style.transform = '';
+                            ch.style.textShadow = '';
+                            ch.style.opacity = '';
+                        });
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+            } catch (err) {
+                console.error("Initialization error:", err);
+                alert("Script error preventing effects: " + err.message);
+            }
+        }
+        
+        // Execute immediately since script is at the end of body
+        initPresentation();
+
+    </script>
+</body>
+</html>
